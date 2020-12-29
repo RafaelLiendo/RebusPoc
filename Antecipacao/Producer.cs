@@ -22,7 +22,8 @@ namespace Antecipacao
             {
                 Console.WriteLine(@"
 a) Send Ping
-q) Quit");
+q) Quit
+");
                 var key = char.ToLower(Console.ReadKey(true).KeyChar);
 
                 switch (key)
@@ -45,7 +46,8 @@ q) Quit");
         {
             Console.WriteLine("Publishing Ping");
 
-            bus.Publish(new Ping { Foo = "Rafael" }).Wait();
+            bus.Publish(new Shared.Ping { Foo = "Rafael" }).Wait();
+            //bus.Publish(new Ping { Foo = "Rafael" }).Wait();
         }
     }
 }

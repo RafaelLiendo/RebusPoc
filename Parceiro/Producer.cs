@@ -1,7 +1,6 @@
 ﻿
 using System;
 using Rebus.Bus;
-using Shared;
 
 namespace Parceiro
 {
@@ -22,7 +21,8 @@ namespace Parceiro
             {
                 Console.WriteLine(@"
 a) Send Pong
-q) Quit");
+q) Quit
+");
                 var key = char.ToLower(Console.ReadKey(true).KeyChar);
 
                 switch (key)
@@ -45,7 +45,8 @@ q) Quit");
         {
             Console.WriteLine("Publishing Pong");
 
-            bus.Publish(new Pong { Bar = "Zini" }).Wait();
+            bus.Publish(new Shared.Pong { Bar = "Zini" }).Wait();
+            //bus.Publish(new Pong { Bar = "Zini" }).Wait();
         }
     }
 }

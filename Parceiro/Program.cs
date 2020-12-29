@@ -2,7 +2,6 @@
 using Rebus.Config;
 using Rebus.Routing.TypeBased;
 using Rebus.ServiceProvider;
-using Rebus.Extensions;
 using Shared;
 
 namespace Parceiro
@@ -13,6 +12,7 @@ namespace Parceiro
         {
             var inputQueueName = "Segundo";
             var rabbitMqConfiguration = new RabbitMqConfiguration();
+            var connectionString = rabbitMqConfiguration.ToConnectionString();
 
             // 1. Service registration pipeline...
             var services = new ServiceCollection();
@@ -22,8 +22,11 @@ namespace Parceiro
             // 1.1. Configure Rebus
             services.AddRebus(configure => configure
                 .Logging(l => l.ColoredConsole())
-                .Transport(t => t.UseRabbitMq(rabbitMqConfiguration.ToConnectionString(), inputQueueName))
-                .Routing(r => r.TypeBased().Map<Ping>("ASUDHASDIHUAS") ));
+                .Transport(t => t.UseRabbitMq(connectionString, inputQueueName))
+                .Routing(r => r.TypeBased()
+                    .Map<Shared.Ping>("ASUDHASDIHUAS")
+                    .Map<Shared.Pong>("KKKKKKKK")
+                ));
 
             // 1.2. Potentially add more service registrations for the application, some of which
             //      could be required by handlers.
@@ -35,7 +38,7 @@ namespace Parceiro
                 // 3. Application started pipeline...
 
                 // 3.1. Now application is running, lets trigger the 'start' of Rebus.
-                provider.UseRebus(a => a.Subscribe<Ping>());
+                provider.UseRebus(a => a.Subscribe<Shared.Ping>());
                 //optionally...
                 //provider.UseRebus(async bus => await bus.Subscribe<Message1>());
 

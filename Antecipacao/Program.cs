@@ -23,7 +23,10 @@ namespace Antecipacao
             services.AddRebus(configure => configure
                 .Logging(l => l.ColoredConsole())
                 .Transport(t => t.UseRabbitMq(connectionString, inputQueueName))
-                .Routing(r => r.TypeBased().Map<Ping>("KKKKKKKK")));
+                .Routing(r => r.TypeBased()
+                    .Map<Shared.Ping>("ASUDHASDIHUAS")
+                    .Map<Shared.Pong>("KKKKKKKK")
+                ));
 
             // 1.2. Potentially add more service registrations for the application, some of which
             //      could be required by handlers.
@@ -35,7 +38,7 @@ namespace Antecipacao
                 // 3. Application started pipeline...
 
                 // 3.1. Now application is running, lets trigger the 'start' of Rebus.
-                provider.UseRebus(a => a.Subscribe<Pong>());
+                provider.UseRebus(a => a.Subscribe<Shared.Pong>());
                 //optionally...
                 //provider.UseRebus(async bus => await bus.Subscribe<Message1>());
 
