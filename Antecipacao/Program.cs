@@ -2,6 +2,7 @@
 using Rebus.Config;
 using Rebus.Routing.TypeBased;
 using Rebus.ServiceProvider;
+using Rebus.Topic;
 using Shared;
 
 namespace Antecipacao
@@ -10,7 +11,7 @@ namespace Antecipacao
     {
         static void Main(string[] args)
         {
-            var inputQueueName = "Primeiro";
+            var inputQueueName = "Antecipacao";
             var rabbitMqConfiguration = new RabbitMqConfiguration();
             var connectionString = rabbitMqConfiguration.ToConnectionString();
 
@@ -23,10 +24,8 @@ namespace Antecipacao
             services.AddRebus(configure => configure
                 .Logging(l => l.ColoredConsole())
                 .Transport(t => t.UseRabbitMq(connectionString, inputQueueName))
-                .Routing(r => r.TypeBased()
-                    .Map<Shared.Ping>("ASUDHASDIHUAS")
-                    .Map<Shared.Pong>("KKKKKKKK")
-                ));
+                .Options(o => o.UseCustomTopicNameConvention(prefix: $"{inputQueueName}_"))
+            );
 
             // 1.2. Potentially add more service registrations for the application, some of which
             //      could be required by handlers.
@@ -38,7 +37,7 @@ namespace Antecipacao
                 // 3. Application started pipeline...
 
                 // 3.1. Now application is running, lets trigger the 'start' of Rebus.
-                provider.UseRebus(a => a.Subscribe<Shared.Pong>());
+                provider.UseRebus(a => a.Subscribe<Pong>());
                 //optionally...
                 //provider.UseRebus(async bus => await bus.Subscribe<Message1>());
 
