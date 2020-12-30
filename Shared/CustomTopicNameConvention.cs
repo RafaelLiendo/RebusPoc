@@ -39,9 +39,11 @@ namespace Shared
 
         public string GetTopic(Type eventType)
         {
-            return _knownTypes.ContainsKey(eventType)
+            var topicName = (_knownTypes?.ContainsKey(eventType) ?? false)
                 ? _knownTypes[eventType]
                 : GetTopicByConvention(eventType);
+
+            return topicName;
         }
 
         private string GetTopicByConvention(Type eventType)

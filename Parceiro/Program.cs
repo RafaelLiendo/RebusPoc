@@ -18,7 +18,7 @@ namespace Parceiro
 
             var topicsDictionary = new TopicsDictionary()
             {
-                ["Antecipacao_Ping"] = typeof(Ping),
+                { typeof(Ping), "Antecipacao_Ping"  },
             };
 
             // 1. Service registration pipeline...
@@ -32,10 +32,9 @@ namespace Parceiro
                 .Logging(l => l.ColoredConsole())
                 .Transport(t => t.UseRabbitMq(connectionString, inputQueueName))
                 .Serialization(s => s.UseNewtonsoftJson(JsonInteroperabilityMode.PureJson))
-                .Options(o => o
-                    .UseCustomTopicPipeline()
-                    .UseCustomMessageDeserializer(topicsDictionary)
-                    .UseCustomTopicNameConvention(prefix: $"{inputQueueName}_"))
+                .Options(o => o.UseCustomTopicNameConvention(topicsDictionary, prefix: $"{inputQueueName}_"))
+                    //.UseCustomTopicPipeline()
+                    //.UseCustomMessageDeserializer(topicsDictionary))
             );
 
             // 1.2. Potentially add more service registrations for the application, some of which
@@ -48,13 +47,7 @@ namespace Parceiro
                 // 3. Application started pipeline...
 
                 // 3.1. Now application is running, lets trigger the 'start' of Rebus.
-                provider.UseRebus(rebus =>
-                {
-                    Task.WaitAll(
-                        topicsDictionary.Keys.Select(topic =>
-                            rebus.Advanced.Topics.Subscribe(topic)
-                        ).ToArray());
-                });
+                provider.UseRebus(rebus => rebus.Subscribe(topicsDictionary).Wait());
                 //optionally...
                 //provider.UseRebus(async bus => await bus.Subscribe<Message1>());
 
