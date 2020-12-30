@@ -1,9 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Rebus.Config;
-using Rebus.Routing.TypeBased;
+using Rebus.Serialization.Json;
 using Rebus.ServiceProvider;
-using Rebus.Topic;
 using Shared;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Antecipacao
 {
@@ -15,16 +16,26 @@ namespace Antecipacao
             var rabbitMqConfiguration = new RabbitMqConfiguration();
             var connectionString = rabbitMqConfiguration.ToConnectionString();
 
+            var topicsDictionary = new TopicsDictionary()
+            {
+                { typeof(Pong), "Parceiro_Pong"  }
+            };
+
             // 1. Service registration pipeline...
             var services = new ServiceCollection();
-            services.AutoRegisterHandlersFromAssemblyOf<Handler1>();
+            services.AddSingleton(topicsDictionary);
+            services.AutoRegisterHandlersFromAssemblyOf<Program>();
             services.AddSingleton<Producer>();
 
             // 1.1. Configure Rebus
             services.AddRebus(configure => configure
                 .Logging(l => l.ColoredConsole())
                 .Transport(t => t.UseRabbitMq(connectionString, inputQueueName))
-                .Options(o => o.UseCustomTopicNameConvention(prefix: $"{inputQueueName}_"))
+                .Serialization(s => s.UseNewtonsoftJson(JsonInteroperabilityMode.PureJson))
+                .Options(o => o
+                    .UseCustomTopicPipeline()
+                    .UseCustomTopicNameConvention(prefix: $"{inputQueueName}_")
+                    .UseCustomMessageDeserializer(topicsDictionary))
             );
 
             // 1.2. Potentially add more service registrations for the application, some of which
@@ -37,7 +48,13 @@ namespace Antecipacao
                 // 3. Application started pipeline...
 
                 // 3.1. Now application is running, lets trigger the 'start' of Rebus.
-                provider.UseRebus(a => a.Subscribe<Pong>());
+                provider.UseRebus(rebus =>
+                {
+                    Task.WaitAll(
+                        topicsDictionary.Keys.Select(topic => 
+                            rebus.Advanced.Topics.Subscribe(topic)
+                        ).ToArray());
+                });
                 //optionally...
                 //provider.UseRebus(async bus => await bus.Subscribe<Message1>());
 

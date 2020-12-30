@@ -45,8 +45,7 @@ q) Quit
         {
             Console.WriteLine("Publishing Pong");
 
-            bus.Publish(new Shared.Pong { Bar = "Zini" }).Wait();
-            //bus.Publish(new Pong { Bar = "Zini" }).Wait();
+            bus.Publish(new Pong { Bar = "Zini" }).Wait();
         }
     }
 }

@@ -7,18 +7,20 @@ namespace Shared
 {
     public static class CustomTopicNameConventionExtension
     {
-        public static void UseCustomTopicNameConvention(this OptionsConfigurer c, string prefix = null, string suffix = null)
+        public static OptionsConfigurer UseCustomTopicNameConvention(this OptionsConfigurer c, TopicsDictionary knownTypes =  null, string prefix = null, string suffix = null)
         {
-            c.Register<ITopicNameConvention>(c => new CustomTopicNameConvention(prefix, suffix));
+            c.Register<ITopicNameConvention>(c => new CustomTopicNameConvention(knownTypes, prefix, suffix));
+            return c;
         }
     }
 
     public class CustomTopicNameConvention : ITopicNameConvention
     {
+        private readonly TopicsDictionary _knownTypes;
         private readonly string _prefix;
         private readonly string _suffix;
-       
-        public CustomTopicNameConvention(string prefix = null, string suffix = null)
+
+        public CustomTopicNameConvention(TopicsDictionary knownTypes = null, string prefix = null, string suffix = null)
         {
             if(prefix != null && prefix.IndexOfAny(new char[] { '.', '+', '´' }) != -1)
             {
@@ -30,11 +32,19 @@ namespace Shared
                 throw new ArgumentException("O Azure Service Bus não suporta os caracteres ., +, ´ ");
             }
 
+           _knownTypes = knownTypes;
            _prefix = prefix;
            _suffix = suffix;
         }
 
         public string GetTopic(Type eventType)
+        {
+            return _knownTypes.ContainsKey(eventType)
+                ? _knownTypes[eventType]
+                : GetTopicByConvention(eventType);
+        }
+
+        private string GetTopicByConvention(Type eventType)
         {
             string eventName;
             var displayNameAnnotation = GetDisplayNameAnnotation(eventType);

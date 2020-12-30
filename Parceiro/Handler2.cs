@@ -5,9 +5,9 @@ using Shared;
 
 namespace Parceiro
 {
-    public class Handler2 : IHandleMessages<Shared.Ping>
+    public class Handler2 : IHandleMessages<Ping>
     {
-        public Task Handle(Shared.Ping message)
+        public Task Handle(Ping message)
         {
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"Handler2 received : Ping {message.Foo}");

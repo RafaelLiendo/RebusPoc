@@ -5,9 +5,9 @@ using Shared;
 
 namespace Antecipacao
 {
-    public class Handler1 : IHandleMessages<Shared.Pong>
+    public class Handler1 : IHandleMessages<Pong>
     {
-        public Task Handle(Shared.Pong message)
+        public Task Handle(Pong message)
         {
             Console.ForegroundColor = ConsoleColor.Magenta;
             Console.WriteLine($"Handler1 received : Pong {message.Bar}");

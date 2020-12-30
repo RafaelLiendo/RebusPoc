@@ -46,8 +46,7 @@ q) Quit
         {
             Console.WriteLine("Publishing Ping");
 
-            bus.Publish(new Shared.Ping { Foo = "Rafael" }).Wait();
-            //bus.Publish(new Ping { Foo = "Rafael" }).Wait();
+            bus.Publish(new Ping { Foo = "Rafael" }).Wait();
         }
     }
 }
