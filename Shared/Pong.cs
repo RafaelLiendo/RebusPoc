@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Parceiro
+namespace Shared
 {
-    public class Ping
+    public class Pong
     {
-        public string Foo { get; set; }
+        public string Bar { get; set; }
     }
 }

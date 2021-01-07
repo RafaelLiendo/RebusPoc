@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Antecipacao
+namespace Shared
 {
-    public class Pong
+    public class Ping
     {
-        public string Bar { get; set; }
+        public string Foo { get; set; }
     }
 }

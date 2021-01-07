@@ -1,10 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Rebus.Config;
-using Rebus.Serialization.Json;
 using Rebus.ServiceProvider;
 using Shared;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace Parceiro
 {
@@ -16,25 +13,14 @@ namespace Parceiro
             var rabbitMqConfiguration = new RabbitMqConfiguration();
             var connectionString = rabbitMqConfiguration.ToConnectionString();
 
-            var topicsDictionary = new TopicsDictionary()
-            {
-                { typeof(Ping), "Antecipacao_Ping"  },
-            };
-
             // 1. Service registration pipeline...
             var services = new ServiceCollection();
-            services.AddSingleton(topicsDictionary);
             services.AutoRegisterHandlersFromAssemblyOf<Program>();
             services.AddSingleton<Producer>();
 
             // 1.1. Configure Rebus
             services.AddRebus(configure => configure
-                .Logging(l => l.ColoredConsole())
                 .Transport(t => t.UseRabbitMq(connectionString, inputQueueName))
-                .Serialization(s => s.UseNewtonsoftJson(JsonInteroperabilityMode.PureJson))
-                .Options(o => o.UseCustomTopicNameConvention(topicsDictionary, prefix: $"{inputQueueName}_"))
-                    //.UseCustomTopicPipeline()
-                    //.UseCustomMessageDeserializer(topicsDictionary))
             );
 
             // 1.2. Potentially add more service registrations for the application, some of which
@@ -47,7 +33,7 @@ namespace Parceiro
                 // 3. Application started pipeline...
 
                 // 3.1. Now application is running, lets trigger the 'start' of Rebus.
-                provider.UseRebus(rebus => rebus.Subscribe(topicsDictionary).Wait());
+                provider.UseRebus(rebus => rebus.Subscribe<Ping>().Wait());
                 //optionally...
                 //provider.UseRebus(async bus => await bus.Subscribe<Message1>());
 

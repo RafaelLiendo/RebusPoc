@@ -1,6 +1,7 @@
 ﻿
 using System;
 using Rebus.Bus;
+using Shared;
 
 namespace Parceiro
 {
