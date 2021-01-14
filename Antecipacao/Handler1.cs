@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Rebus.Handlers;
-using Shared;
 
 namespace Antecipacao
 {

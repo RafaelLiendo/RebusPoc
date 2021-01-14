@@ -1,6 +1,7 @@
 ﻿
 using System;
 using Rebus.Bus;
+using RebusExtensions;
 
 namespace Parceiro
 {
@@ -45,7 +46,7 @@ q) Quit
         {
             Console.WriteLine("Publishing Pong");
 
-            bus.Publish(new Pong { Bar = "Zini" }).Wait();
+            bus.Publish("Parceiro_Pong", new Pong { Bar = "Zini" }).Wait();
         }
     }
 }

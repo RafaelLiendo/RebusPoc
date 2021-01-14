@@ -1,7 +1,7 @@
 ﻿
 using System;
 using Rebus.Bus;
-using Shared;
+using RebusExtensions;
 
 namespace Antecipacao
 {
@@ -46,7 +46,7 @@ q) Quit
         {
             Console.WriteLine("Publishing Ping");
 
-            bus.Publish(new Ping { Foo = "Rafael" }).Wait();
+            bus.Publish("Antecipacao_Ping", new Ping { Foo = "Rafael" }).Wait();
         }
     }
 }
