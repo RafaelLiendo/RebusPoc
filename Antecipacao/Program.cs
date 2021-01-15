@@ -17,7 +17,7 @@ namespace Antecipacao
 
             var topicsDictionary = new TopicsDictionary(new Dictionary<string, Type>
             {
-                { "Parceiro_Pong",      typeof(Pong) }
+                { "Parceiro_Pong", typeof(Pong) }
             });
 
             // 1. Service registration pipeline...
@@ -44,7 +44,7 @@ namespace Antecipacao
                 // 3.1. Now application is running, lets trigger the 'start' of Rebus.
                 provider.UseRebus(rebus =>
                 {
-                    rebus.Subscribe(topicsDictionary).Wait();
+                    rebus.Subscribe<Pong>();
                 });
                 //optionally...
                 //provider.UseRebus(async bus => await bus.Subscribe<Message1>());
