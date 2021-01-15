@@ -47,6 +47,7 @@ q) Quit
             Console.WriteLine("Publishing Ping");
 
             bus.Publish("Antecipacao_Ping", new Ping { Foo = "Rafael" }).Wait();
+            //bus.Publish(new Ping { Foo = "Rafael2" }).Wait();
         }
     }
 }

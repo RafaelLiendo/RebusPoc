@@ -11,14 +11,13 @@ namespace Parceiro
     {
         static void Main(string[] args)
         {
-            var inputQueueName = "Antecipacao";
+            var inputQueueName = "Parceiro";
             var rabbitMqConfiguration = new RabbitMqConfiguration();
             var connectionString = rabbitMqConfiguration.ToConnectionString();
 
             var topicsDictionary = new TopicsDictionary(new Dictionary<string, Type>
             {
-                ["Antecipacao_Ping"] = typeof(Ping),
-                ["Parceiro_Pong"] = typeof(Pong)
+                { "Antecipacao_Ping",   typeof(Ping) },
             });
 
             // 1. Service registration pipeline...
@@ -30,7 +29,7 @@ namespace Parceiro
             // 1.1. Configure Rebus
             services.AddRebus(configure => configure
                 .Transport(t => t.UseRabbitMq(connectionString, inputQueueName))
-                .UseNoCodeSharing(topicsDictionary)
+                .UseExplicitTopicMapping(topicsDictionary)
             );
 
             // 1.2. Potentially add more service registrations for the application, some of which

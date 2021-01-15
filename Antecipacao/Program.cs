@@ -17,8 +17,7 @@ namespace Antecipacao
 
             var topicsDictionary = new TopicsDictionary(new Dictionary<string, Type>
             {
-                ["Antecipacao_Ping"] = typeof(Ping),
-                ["Parceiro_Pong"] = typeof(Pong)
+                { "Parceiro_Pong",      typeof(Pong) }
             });
 
             // 1. Service registration pipeline...
@@ -30,7 +29,7 @@ namespace Antecipacao
             // 1.1. Configure Rebus
             services.AddRebus(configure => configure
                 .Transport(t => t.UseRabbitMq(connectionString, inputQueueName))
-                .UseNoCodeSharing(topicsDictionary)
+                .UseExplicitTopicMapping(topicsDictionary)
             );
 
             // 1.2. Potentially add more service registrations for the application, some of which
