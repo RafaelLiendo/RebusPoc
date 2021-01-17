@@ -1,8 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Rebus.Config;
+using Rebus.Serialization;
+using Rebus.Serialization.Custom;
 using Rebus.ServiceProvider;
+using Rebus.Topic;
 using RebusExtensions;
-using System;
 using System.Collections.Generic;
 
 namespace Antecipacao
@@ -15,21 +17,23 @@ namespace Antecipacao
             var rabbitMqConfiguration = new RabbitMqConfiguration();
             var connectionString = rabbitMqConfiguration.ToConnectionString();
 
-            var topicsDictionary = new TopicsDictionary(new Dictionary<string, Type>
-            {
-                { "Parceiro_Pong", typeof(Pong) }
-            });
-
             // 1. Service registration pipeline...
             var services = new ServiceCollection();
-            services.AddSingleton(topicsDictionary);
             services.AutoRegisterHandlersFromAssemblyOf<Program>();
             services.AddSingleton<Producer>();
 
             // 1.1. Configure Rebus
             services.AddRebus(configure => configure
                 .Transport(t => t.UseRabbitMq(connectionString, inputQueueName))
-                .UseExplicitTopicMapping(topicsDictionary)
+                .Serialization(s => s.UseCustomMessageTypeNames()
+                    .AddWithCustomName<Ping>("Antecipacao:Ping")
+                    .AddWithCustomName<Pong>("Parceiro:Pong")
+                )
+                .Options(o =>
+                {
+                    o.Register<ITopicNameConvention>(c => new TesteTopicNameConvention(c.Get<IMessageTypeNameConvention>()));
+                    o.UseCustomTopicPipeline();
+                })
             );
 
             // 1.2. Potentially add more service registrations for the application, some of which
@@ -44,7 +48,7 @@ namespace Antecipacao
                 // 3.1. Now application is running, lets trigger the 'start' of Rebus.
                 provider.UseRebus(rebus =>
                 {
-                    rebus.Subscribe<Pong>();
+                    rebus.Advanced.Topics.Subscribe("Parceiro:Pong");
                 });
                 //optionally...
                 //provider.UseRebus(async bus => await bus.Subscribe<Message1>());
