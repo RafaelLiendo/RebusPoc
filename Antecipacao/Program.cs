@@ -4,8 +4,10 @@ using Rebus.Serialization;
 using Rebus.Serialization.Custom;
 using Rebus.ServiceProvider;
 using Rebus.Topic;
+using Rebus.Extensions;
 using RebusExtensions;
 using System.Collections.Generic;
+using Rebus.Serialization.Json;
 
 namespace Antecipacao
 {
@@ -27,8 +29,9 @@ namespace Antecipacao
                 .Transport(t => t.UseRabbitMq(connectionString, inputQueueName))
                 .Serialization(s => s.UseCustomMessageTypeNames()
                     .AddWithCustomName<Ping>("Antecipacao:Ping")
-                    .AddWithCustomName<Pong>("Parceiro:Pong")
+                    .AddWithCustomName<Pong>("Parceiro:Pong")                    
                 )
+                .Serialization(s => s.UseNewtonsoftJson(JsonInteroperabilityMode.PureJson))
                 .Options(o =>
                 {
                     o.Register<ITopicNameConvention>(c => new TesteTopicNameConvention(c.Get<IMessageTypeNameConvention>()));
@@ -48,7 +51,8 @@ namespace Antecipacao
                 // 3.1. Now application is running, lets trigger the 'start' of Rebus.
                 provider.UseRebus(rebus =>
                 {
-                    rebus.Advanced.Topics.Subscribe("Parceiro:Pong");
+                    //rebus.Advanced.Topics.Subscribe("Parceiro:Pong");
+                    rebus.Subscribe<Pong>();
                 });
                 //optionally...
                 //provider.UseRebus(async bus => await bus.Subscribe<Message1>());

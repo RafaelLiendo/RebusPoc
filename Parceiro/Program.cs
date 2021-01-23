@@ -2,6 +2,7 @@
 using Rebus.Config;
 using Rebus.Serialization;
 using Rebus.Serialization.Custom;
+using Rebus.Serialization.Json;
 using Rebus.ServiceProvider;
 using Rebus.Topic;
 using RebusExtensions;
@@ -30,6 +31,7 @@ namespace Parceiro
                     .AddWithCustomName<Ping>("Antecipacao:Ping")
                     .AddWithCustomName<Pong>("Parceiro:Pong")
                 )
+                .Serialization(s => s.UseNewtonsoftJson(JsonInteroperabilityMode.PureJson))
                 .Options(o =>
                 {
                     o.Register<ITopicNameConvention>(c => new TesteTopicNameConvention(c.Get<IMessageTypeNameConvention>()));
@@ -49,7 +51,8 @@ namespace Parceiro
                 // 3.1. Now application is running, lets trigger the 'start' of Rebus.
                 provider.UseRebus(rebus =>
                 {
-                    rebus.Advanced.Topics.Subscribe("Antecipacao:Ping");
+                    //rebus.Advanced.Topics.Subscribe("Antecipacao:Ping");
+                    rebus.Subscribe<Ping>();
                 });
                 //optionally...
                 //provider.UseRebus(async bus => await bus.Subscribe<Message1>());
